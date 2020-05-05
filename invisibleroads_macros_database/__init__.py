@@ -17,14 +17,21 @@ class DatabaseExtension(ABC):
 class SpatialiteExtension(DatabaseExtension):
 
     def configure(self, engine):
-        if not self.settings[self.prefix + 'url'].startswith('sqlite'):
+        sqlalchemy_url = self.settings[self.prefix + 'url']
+        if not sqlalchemy_url.startswith('sqlite'):
             return
+        load_spatialite_sqlite_extension(engine)
 
-        def load_spatialite(api_connection, connection_record):
-            api_connection.enable_load_extension(True)
-            api_connection.load_extension('mod_spatialite.so')
 
-        listen(engine, 'connect', load_spatialite)
-        engine_connection = engine.connect()
-        engine_connection.execute(select([func.InitSpatialMetaData()]))
-        engine_connection.close()
+def load_spatialite_sqlite_extension(engine):
+
+    def load_spatialite(api_connection, connection_record):
+        api_connection.enable_load_extension(True)
+        api_connection.load_extension('mod_spatialite.so')
+
+    listen(engine, 'connect', load_spatialite)
+    # https://github.com/Toblerity/Shapely/issues/904
+    from shapely import speedups  # noqa
+    engine_connection = engine.connect()
+    engine_connection.execute(select([func.InitSpatialMetaData()]))
+    engine_connection.close()

@@ -11,6 +11,9 @@ APP_CLASSIFIERS = [
 APP_REQUIREMENTS = [
     'sqlalchemy',
 ]
+SPATIALITE_REQUIREMENTS = [
+    'shapely',
+]
 TEST_REQUIREMENTS = [
     'pytest',
     'pytest-cov',
@@ -22,7 +25,7 @@ DESCRIPTION = '\n\n'.join(open(join(FOLDER, x)).read().strip() for x in [
 
 setup(
     name='invisibleroads-macros-database',
-    version='1.0.0',
+    version='1.0.1',
     description='Shortcut functions for database operations',
     long_description=DESCRIPTION,
     long_description_content_type='text/markdown',
@@ -36,6 +39,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    extras_require={'test': TEST_REQUIREMENTS},
+    extras_require={
+        'spatialite': SPATIALITE_REQUIREMENTS,
+        'test': TEST_REQUIREMENTS,
+    },
     install_requires=APP_REQUIREMENTS,
     entry_points=ENTRY_POINTS)
